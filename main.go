@@ -8,14 +8,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Creating the Basic structure
 type event struct {
 	ID          string `json:"ID"`
 	Title       string `json:"Title"`
 	Description string `json:"Description"`
 }
 
+// Creating a new type "allEvents" of type "Slice of Event" (kind of an alias)
 type allEvents []event
 
+// Creating a new variable of type "allEvents" which contain a Json of event
 var events = allEvents{
 	{
 		ID:          "1",
@@ -23,6 +26,8 @@ var events = allEvents{
 		Description: "Making a tutorial to learn how to build a Golang API",
 	},
 }
+
+// Create a new event
 
 func homeLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome")
