@@ -97,6 +97,17 @@ func updateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func removeEvent(w http.ResponseWriter, r *http.Request) {
+	eventId := mux.Vars(r)["id"]
+
+	for i, singleEvent := range events {
+		if singleEvent.ID == eventId {
+			events = append(events[:i], events[i+1:]...)
+			fmt.Fprintf(w, "Event %v successfully deleted.\n", eventId)
+		}
+	}
+}
+
 func homeLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome")
 }
@@ -108,6 +119,7 @@ func main() {
 	router.HandleFunc("/events", getAllEvents).Methods("GET")
 	router.HandleFunc("/events/{id}", getOneEvent).Methods("GET")
 	router.HandleFunc("/events/{id}", updateEvent).Methods("PATCH")
+	router.HandleFunc("/events/{id}", removeEvent).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8088", router))
 }
