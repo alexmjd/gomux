@@ -49,6 +49,18 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newEvent)
 }
 
+func getOneEvent(w http.ResponseWriter, r *http.Request) {
+	// Get the id argument from the request
+	eventId := mux.Vars(r)["id"]
+
+	// Look in events slice if there's a match
+	for _, singleEvent := range events {
+		if singleEvent.ID == eventId {
+			json.NewEncoder(w).Encode(singleEvent)
+		}
+	}
+}
+
 func homeLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome")
 }
@@ -57,6 +69,7 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
 	router.HandleFunc("/event", createEvent)
+	router.HandleFunc("/events/{id}", getOneEvent)
 
 	log.Fatal(http.ListenAndServe(":8088", router))
 }
