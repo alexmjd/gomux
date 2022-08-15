@@ -65,6 +65,38 @@ func getAllEvents(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(events)
 }
 
+func updateEvent(w http.ResponseWriter, r *http.Request) {
+
+	// Get the id from request
+	eventId := mux.Vars(r)["id"]
+	var updatedEvent event
+
+	// Read all data in body and put them in reqBody
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Cannot update, error occured.\n")
+	}
+
+	// Put reqBody json contents inside the event updatedEvent (given by reference)
+	json.Unmarshal(reqBody, &updatedEvent)
+
+	// Go throught slice of events
+	for i, singleEvent := range events {
+		if singleEvent.ID == eventId {
+
+			// Change values if found
+			singleEvent.Title = updatedEvent.Title
+			singleEvent.Description = updatedEvent.Description
+
+			// Change the value of event at index in the slice by the new updatedEvent
+			events = append(events[:i], singleEvent)
+
+			// Write the new updatedEvent to the ResponseWriter
+			json.NewEncoder(w).Encode(singleEvent)
+		}
+	}
+}
+
 func homeLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome")
 }
@@ -72,9 +104,10 @@ func homeLink(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
-	router.HandleFunc("/event", createEvent)
-	router.HandleFunc("/events", getAllEvents)
-	router.HandleFunc("/events/{id}", getOneEvent)
+	router.HandleFunc("/event", createEvent).Methods("POST")
+	router.HandleFunc("/events", getAllEvents).Methods("GET")
+	router.HandleFunc("/events/{id}", getOneEvent).Methods("GET")
+	router.HandleFunc("/events/{id}", updateEvent).Methods("PATCH")
 
 	log.Fatal(http.ListenAndServe(":8088", router))
 }
