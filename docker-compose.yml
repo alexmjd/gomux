@@ -3,7 +3,7 @@ version: "3.9"
 services:
   db:
     image: mysql:5.7
-    container_name: bibli
+    container_name: godb
     ports:
       - "6666:3306"
     volumes:
