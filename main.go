@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -27,7 +29,25 @@ var events = allEvents{
 	},
 }
 
-// Create a new event
+// Create a new event (A Request handler take always 2 args, the ResponseWritter and a pointer on Request)
+func createEvent(w http.ResponseWriter, r *http.Request) {
+	var newEvent event
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "A problem occured")
+	}
+
+	// Put the content of "reqBody" in our "newEvent" variable, passing its reference
+	json.Unmarshal(reqBody, &newEvent)
+	events = append(events, newEvent)
+
+	// Set the ResponseWriter's Header to Status Created (201)
+	w.WriteHeader(http.StatusCreated)
+
+	// Write in the ResponseWriter the encoded newEvent
+	json.NewEncoder(w).Encode(newEvent)
+}
 
 func homeLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Welcome")
@@ -36,6 +56,7 @@ func homeLink(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
+	router.HandleFunc("/event", createEvent)
 
 	log.Fatal(http.ListenAndServe(":8088", router))
 }
