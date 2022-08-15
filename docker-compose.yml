@@ -6,8 +6,8 @@ services:
     container_name: godb
     ports:
       - "6666:3306"
-    volumes:
-      - "./database:/docker-entrypoint-initdb.d"
+    # volumes:
+    #   - "./database:/docker-entrypoint-initdb.d"
     restart: always
     environment:
       
